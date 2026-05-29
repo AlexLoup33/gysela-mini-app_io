@@ -1,4 +1,4 @@
-# GYSELA Mini App
+# GYSELA I/O Mini App
 
 A minimal application demonstrating GYSELA I/O operations and testing the cpu performance scaling for 5D particle distribution functions.
 
@@ -28,7 +28,7 @@ mpirun -n 4 ./gys_io gys_io.yaml
 Do not forget to set the the `PYTHONPATH` if you are using PyCall:
 
 ```bash
-export PYTHONPATH=/home/PK282018/develop/gysela-mini-app_io/python:$PYTHONPATH
+export PYTHONPATH=/path/to/your/gysela-mini-app_io/python:$PYTHONPATH
 ```
 
 ## Configuration
