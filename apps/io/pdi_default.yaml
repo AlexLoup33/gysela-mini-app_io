@@ -365,7 +365,7 @@ plugins:
         timing_values: ~
 
     #-- Write distribution function and coordinates
-    - file: 'local_fdistribu_5D_output.h5'
+    - file: 'fdistribu_5D_output.h5'
       on_event: [write_fdistribu]
       collision_policy: replace_and_warn
       communicator: $MPI_COMM_WORLD

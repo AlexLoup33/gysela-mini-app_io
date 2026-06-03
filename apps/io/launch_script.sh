@@ -3,12 +3,15 @@
 SIMU_NODES=${1:-1}
 DASK_WORKERS=${2:-1}
 
-SCHEFILE=scheduler.json
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"/..
+BASE_DIR="$(cd $SCRIPT_DIR/../.. && pwd)"
 
+. $SCRIPT_DIR/env-miniapp-gysela.sh
+
+SCHEFILE="$BASE_DIR/scheduler.json"
 rm -f $SCHEFILE
+
+cd $BASE_DIR
 
 echo "Launch scheduler"
 dask scheduler --scheduler-file=$SCHEFILE &
@@ -31,11 +34,11 @@ dask_worker_pid=$!
 sleep 10
 
 echo "Launch analytics"
-python3 python/analytics.py apps/gys_io.yaml &
+python3 python/analytics.py apps/io/gys_io.yaml &
 analytics_pid=$!
 
 echo "Launch simu"
-mpirun -n $SIMU_NODES build/apps/gys_io apps/gys_io.yaml apps/pdi_default.yaml & 
+mpirun -n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_default.yaml & 
 simu_pid=$!
 
 wait ${analytics_pid}
