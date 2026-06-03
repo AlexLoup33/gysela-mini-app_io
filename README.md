@@ -36,6 +36,12 @@ cmake -S . -B build \
   -DBUILD_COMPRESSION_APP=ON
 cmake --build build -j 4
 ```
+For the docker toolchain, you should use the following in the docker container:
+```bash
+cmake -S . -B build
+cmake --build build -j 4
+```
+
 If you want to use Python insitu-diagnostics set additionally the `PYTHONPATH`:
 
 ```bash
