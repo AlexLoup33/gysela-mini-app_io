@@ -31,6 +31,33 @@ Do not forget to set the the `PYTHONPATH` if you are using PyCall:
 export PYTHONPATH=/path/to/your/gysela-mini-app_io/src/python:$PYTHONPATH
 ```
 
+## Usage with Deisa-dask
+
+### Installation
+
+To use deisa-dask, you need to create the environment of the miniapp with additional dependencies.
+
+```bash
+cp apps/io/spack_deisa-dask.yaml external/gyselalibxx/toolchains/<MACHINE>/gyselalibxx-env-1.1.0.yaml
+./external/gyselalibxx/toolchains/cpu.spack.gyselalibxx_env/prepare.sh
+```
+Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps/io/env-miniapp-gysela.sh`
+
+### Basic run
+
+```bash
+./deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
+```
+
+- `nsimu_procs`: number of MPI ranks for the simulation
+- `nworkers`: number of Dask workers to use for the analytics
+
+### Run with OAR
+
+```bash
+./oar_deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
+```
+
 ## Configuration
 
 Edit `gys_io.yaml` to configure:

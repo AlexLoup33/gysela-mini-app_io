@@ -26,7 +26,10 @@ def sum_moments(density, velocity, temperature):
     sum_velocity = velocity[0].sum().compute() 
     sum_temperature = temperature[0].sum().compute() 
 
-    print(f"[Deisa] Iteration {density[0].t}", flush=True)
+    print(f"[Deisa] With arrays of resp. iterations \
+            {density[0].t}, \
+            {velocity[0].t}, \
+            {temperature[0].t}", flush=True)
     print(f"[Deisa] sum density {sum_density}", flush=True)
     print(f"[Deisa] sum velocity {sum_velocity}", flush=True)
     print(f"[Deisa] sum temperature {sum_temperature}", flush=True)

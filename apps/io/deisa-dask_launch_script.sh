@@ -38,7 +38,7 @@ python3 python/analytics.py apps/io/gys_io.yaml &
 analytics_pid=$!
 
 echo "Launch simu"
-mpirun -n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_default.yaml & 
+mpirun -n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_deisa.yaml & 
 simu_pid=$!
 
 wait ${analytics_pid}

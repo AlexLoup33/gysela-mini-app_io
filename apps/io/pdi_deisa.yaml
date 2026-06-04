@@ -157,12 +157,93 @@ plugins:
       Init:
         with: {}
         exec: |
+          import json
+          import time
           import xarray as xr
           import numpy as np
+          import logging
+          from mpi4py import MPI
           from fluid_moments import FluidMoments
-      FluidMoments:
-        with: {local_fdistribu_raw: $local_fdistribu_sptor3Dv2D, vpar_vals: $vpar, mu_vals: $mu}
+          from deisa.dask import Bridge 
+
+          logging.basicConfig(level=logging.DEBUG)
+
+          comm = MPI.COMM_WORLD
+
+          size = comm.Get_size()
+          rank = comm.Get_rank()
+      InitBridge:
+        with: { density_extents: $density_extents, 
+                mean_velocity_extents: $mean_velocity_extents,
+                temperature_extents: $temperature_extents,
+                local_density_extents: $local_density_extents, 
+                local_mean_velocity_extents: $local_mean_velocity_extents,
+                local_temperature_extents: $local_temperature_extents,
+                local_density_starts: $local_density_starts, 
+                local_mean_velocity_starts: $local_mean_velocity_starts,
+                local_temperature_starts: $local_temperature_starts
+
+              }
         exec: |
+          print(f"[Pycall-{rank}] density extents {density_extents}.")
+          print(f"[Pycall-{rank}] velocity extents {mean_velocity_extents}.")
+          print(f"[Pycall-{rank}] temperature extents {temperature_extents}.")
+
+          print(f"[Pycall-{rank}] local density extents {local_density_extents}.")
+          print(f"[Pycall-{rank}] local velocity extents {local_mean_velocity_extents}.")
+          print(f"[Pycall-{rank}] local temperature extents {local_temperature_extents}.")
+
+          print(f"[Pycall-{rank}] local density starts {local_density_starts}.")
+          print(f"[Pycall-{rank}] local velocity starts {local_mean_velocity_starts}.")
+          print(f"[Pycall-{rank}] local temperature starts {local_temperature_starts}.")
+
+
+          print(f"[Pycall-{rank}] size={size},rank={rank}")
+          arrays_metadata = { 
+                              'density': {
+                                      'global_shape': ( int(density_extents[0]),
+                                                        int(density_extents[1]),
+                                                        int(density_extents[2]),
+                                                        int(density_extents[3])),
+                                      'chunk_shape':  ( int(local_density_extents[0]),
+                                                        int(local_density_extents[1]),
+                                                        int(local_density_extents[2]),
+                                                        int(local_density_extents[3])),
+                                      'chunk_position': tuple((local_density_starts // local_density_extents).astype(int).tolist()),
+                              },
+                              'velocity': {
+                                      'global_shape': ( int(mean_velocity_extents[0]),
+                                                        int(mean_velocity_extents[1]),
+                                                        int(mean_velocity_extents[2]),
+                                                        int(mean_velocity_extents[3])),
+                                      'chunk_shape':  ( int(local_mean_velocity_extents[0]),
+                                                        int(local_mean_velocity_extents[1]),
+                                                        int(local_mean_velocity_extents[2]),
+                                                        int(local_mean_velocity_extents[3])),
+                                      'chunk_position': tuple((local_mean_velocity_starts // local_mean_velocity_extents).astype(int).tolist()),
+                              },
+                              'temperature': {
+                                      'global_shape': ( int(temperature_extents[0]),
+                                                        int(temperature_extents[1]),
+                                                        int(temperature_extents[2]),
+                                                        int(temperature_extents[3])),
+                                      'chunk_shape':  ( int(local_temperature_extents[0]),
+                                                        int(local_temperature_extents[1]),
+                                                        int(local_temperature_extents[2]),
+                                                        int(local_temperature_extents[3])),
+                                      'chunk_position': tuple((local_mean_velocity_starts // local_mean_velocity_extents).astype(int).tolist()),
+                              },
+          }
+
+          print(f"[Pycall-{rank}] Start bridge connection", flush=True)
+          bridge = Bridge(comm, arrays_metadata)
+          print(f"[Pycall-{rank}] Bridge connected", flush=True)
+
+      FluidMoments:
+        with: {iter_id: $iter_id, local_fdistribu_raw: $local_fdistribu_sptor3Dv2D, vpar_vals: $vpar, mu_vals: $mu}
+        exec: |
+          print(f"\n[Pycall-{rank}] Iteration {iter_id} ####################")
+
           local_fdistribu = xr.DataArray(
               local_fdistribu_raw,
               dims=('species', 'tor1', 'tor2', 'tor3', 'vpar', 'mu')
@@ -175,12 +256,29 @@ plugins:
           velocity = fm.compute_velocity(local_fdistribu, density).compute()
           temperature = fm.compute_temperature(local_fdistribu, density, velocity).compute()
 
+          print(f"[Pycall-{rank}] Shape density {density.shape} .")
+          print(f"[Pycall-{rank}] Shape velocity {velocity.shape} .")
+          print(f"[Pycall-{rank}] Shape temperature {temperature.shape} .")
+
+          print(f"[Pycall-{rank}] Send arrays")
+          bridge.send("density", density.data, int(iter_id))
+          bridge.send("velocity", velocity.data, int(iter_id))
+          bridge.send("temperature", temperature.data, int(iter_id))
+          print(f"[Pycall-{rank}] Arrays sent")
+
           ds_out = xr.Dataset({
               'density': density,
               'velocity': velocity,
               'temperature': temperature,
           })
-          #ds_out.to_netcdf('fluid_moments.nc')
+
+          print(f"[Pycall-{rank}] Sum local density {density.sum().data} .")
+          print(f"[Pycall-{rank}] Sum local velocity {velocity.sum().data} .")
+          print(f"[Pycall-{rank}] Sum local temperature {temperature.sum().data} .")
+      End:
+        with: {iter_id: $iter_id}
+        exec: |
+          bridge.close(int(iter_id))
   decl_hdf5:
     #-- Read file names and expose them to PDI
     - file: '${gysela_io_filename}'

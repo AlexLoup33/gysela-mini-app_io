@@ -55,7 +55,7 @@ mpirun -machinefile $MPI_NODEFILE \
 	--prefix $(dirname $(dirname $(which mpirun))) \
 	-x PYTHONPATH \
 	-x DEISA_DASK_SCHEDULER_ADDRESS \
-	-n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_default.yaml &
+	-n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_deisa.yaml &
 simu_pid=$!
 
 wait ${analytics_pid}
