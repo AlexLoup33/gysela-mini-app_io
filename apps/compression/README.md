@@ -36,15 +36,7 @@ The compressed branch is run segment by segment. At the end of each segment, exc
 
 ## Running the benchmark
 
-From the project root, build the mini-app first, then run:
-```bash
-python -m venv venv
-source ./venv/bin/activate
-python -m pip install -r apps/compression/requirements.txt
-```
-
-
-Then run:
+Simply run:
 ```bash
 python apps/compression/launch_benchmark.py
 ```
