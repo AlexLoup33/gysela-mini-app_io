@@ -179,11 +179,13 @@ void init_case(
     DFieldMemSpVxVy& allfequilibrium,
     DFieldMemSpXYVxVy& allfdistribu_x2D_split,
     DFieldMemSpVxVyXY& allfdistribu_v2D_split) {
-  std::string const case_name =
-      PC_status(PC_get(configs.conf_gyselax, ".Input.case"))
-          ? "landau_damping"
-          : PCpp_string(configs.conf_gyselax, ".Input.case");
-  cout << "case: " << case_name << endl;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::string const case_name =
+    PC_status(PC_get(configs.conf_gyselax, ".Input.case"))? "landau_damping": PCpp_string(configs.conf_gyselax, ".Input.case");
+    if (rank == 0) {  
+        cout << "case: " << case_name << endl;
+      }
   if (case_name == "landau_damping") {
     init_landau_damping(idx_range_kinsp, configs.conf_gyselax,
                         allfdistribu_x2D_split, allfequilibrium);
