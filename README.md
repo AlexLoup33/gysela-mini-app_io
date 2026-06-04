@@ -12,7 +12,30 @@ cd gysela-mini-app_io
 git submodule update --init --recursive
 ```
 
-## Sourcing the environment
+## Quick install (toolchain + Python + build + tests)
+
+After cloning and initializing submodules:
+
+```bash
+sh ./installer.sh <MACHINE>
+```
+
+Example on Persee (CPU): `./installer.sh persee/xeon`
+
+`<MACHINE>` is a folder under `src/external/gyselalibxx/toolchains/`. 
+Available values:
+
+- `a100.leonardo.spack` — Leonardo (A100)
+- `a100.raven.spack` — Raven (A100)
+- `docker.gyselalibxx_env` — Docker / CI
+- `genoa.gcc.adastra.spack` — Adastra (Genoa CPU)
+- `h100.jean-zay.spack` — Jean Zay (H100)
+- `mi250.hipcc.adastra.spack` — Adastra (MI250)
+- `persee/v100` — Persee (V100)
+- `persee/xeon` — Persee (CPU); default on Persee hosts if `<MACHINE>` is omitted
+- `v100.ruche` — Ruche (V100)
+
+## Manuel Installation
 
 ```bash
 source src/external/gyselalibxx/toolchains/<MACHINE>/environment.sh
