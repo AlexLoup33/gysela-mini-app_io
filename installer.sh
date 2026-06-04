@@ -51,7 +51,6 @@ echo ""
 echo "================================================"
 echo "Install python dependencies"
 echo "================================================"
-export PYTHONPATH="${REPO_ROOT}/src/python${PYTHONPATH:+:${PYTHONPATH}}"
 
 VENV_DIR="${REPO_ROOT}/.gys_env"
 if [[ -f "${VENV_DIR}/bin/activate" ]]; then

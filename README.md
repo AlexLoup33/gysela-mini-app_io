@@ -72,7 +72,6 @@ cmake --build build -j 4
 In order to use the python tools, you'll need to execute the following commands from the repo's root:
 ```bash
 source .gys_env/bin/activate
-export PYTHONPATH=/path/to/your/repo/gysela-mini-app_io/src/python:$PYTHONPATH
 ```
 
 If you want to use Python insitu-diagnostics, the following commands are available from the command line:
