@@ -28,7 +28,7 @@ mpirun -n 4 ./gys_io gys_io.yaml
 Do not forget to set the the `PYTHONPATH` if you are using PyCall:
 
 ```bash
-export PYTHONPATH=/path/to/your/gysela-mini-app_io/python:$PYTHONPATH
+export PYTHONPATH=/path/to/your/gysela-mini-app_io/src/python:$PYTHONPATH
 ```
 
 ## Configuration
