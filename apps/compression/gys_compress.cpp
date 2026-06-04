@@ -114,6 +114,9 @@ void init_two_stream(
   DFieldSpXYVxVy allfdistribu = get_field(allfdistribu_x2D_split);
   DFieldSpVxVy allfequilibrium_field = get_field(allfequilibrium);
 
+  DFieldMemXY perturbation_alloc(gridxy);
+  DFieldXY perturbation = get_field(perturbation_alloc);
+
   double const inv_2pi = 1. / (2. * M_PI);
   double const length_x =
       ddcHelper::total_interval_length(ddc::select<GridX>(gridxy));
@@ -132,33 +135,6 @@ void init_two_stream(
 
     ddc::parallel_for_each(
         Kokkos::DefaultExecutionSpace(),
-        gridxyvxvy,
-        KOKKOS_LAMBDA(IdxXYVxVy const ixyvxvy) {
-          IdxX const ix = ddc::select<GridX>(ixyvxvy);
-          IdxY const iy = ddc::select<GridY>(ixyvxvy);
-          IdxVx const ivx = ddc::select<GridVx>(ixyvxvy);
-          IdxVy const ivy = ddc::select<GridVy>(ixyvxvy);
-          double const x = ddc::coordinate(ix);
-          double const y = ddc::coordinate(iy);
-          double const vx = ddc::coordinate(ivx);
-          double const vy = ddc::coordinate(ivy);
-
-          double const perturb =
-              1. + eps * Kokkos::cos(kx * x) * Kokkos::cos(ky * y);
-          double const m1 = Kokkos::exp(
-              -((vx - v0) * (vx - v0) + (vy - v0) * (vy - v0)) / 2.);
-          double const m2 = Kokkos::exp(
-              -((vx + v0) * (vx + v0) + (vy + v0) * (vy + v0)) / 2.);
-
-          double fdistribu_val = perturb * 0.5 * inv_2pi * (m1 + m2);
-          if (fdistribu_val < 1.e-60) {
-            fdistribu_val = 1.e-60;
-          }
-          allfdistribu(isp, ix, iy, ivx, ivy) = fdistribu_val;
-        });
-
-    ddc::parallel_for_each(
-        Kokkos::DefaultExecutionSpace(),
         gridvxvy,
         KOKKOS_LAMBDA(IdxVxVy const ivxvy) {
           double const vx = ddc::coordinate(ddc::select<GridVx>(ivxvy));
@@ -168,6 +144,35 @@ void init_two_stream(
           double const m2 = Kokkos::exp(
               -((vx + v0) * (vx + v0) + (vy + v0) * (vy + v0)) / 2.);
           allfequilibrium_field(isp, ivxvy) = 0.5 * inv_2pi * (m1 + m2);
+        });
+
+    ddc::parallel_for_each(
+        Kokkos::DefaultExecutionSpace(),
+        gridxy,
+        KOKKOS_LAMBDA(IdxXY const ixy) {
+          IdxX const ix = ddc::select<GridX>(ixy);
+          IdxY const iy = ddc::select<GridY>(ixy);
+          double const x = ddc::coordinate(ix);
+          double const y = ddc::coordinate(iy);
+          perturbation(ix, iy) =
+              1. + eps * Kokkos::cos(kx * x) * Kokkos::cos(ky * y);
+        });
+
+    ddc::parallel_for_each(
+        Kokkos::DefaultExecutionSpace(),
+        gridxyvxvy,
+        KOKKOS_LAMBDA(IdxXYVxVy const ixyvxvy) {
+          IdxX const ix = ddc::select<GridX>(ixyvxvy);
+          IdxY const iy = ddc::select<GridY>(ixyvxvy);
+          IdxVx const ivx = ddc::select<GridVx>(ixyvxvy);
+          IdxVy const ivy = ddc::select<GridVy>(ixyvxvy);
+
+          double fdistribu_val =
+              perturbation(ix, iy) * allfequilibrium_field(isp, ivx, ivy);
+          if (fdistribu_val < 1.e-60) {
+            fdistribu_val = 1.e-60;
+          }
+          allfdistribu(isp, ix, iy, ivx, ivy) = fdistribu_val;
         });
   });
 }
