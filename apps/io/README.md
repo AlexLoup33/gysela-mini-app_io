@@ -25,11 +25,14 @@ mpirun -n <nprocs> ./gys_io [config.yaml] [pdi_config.yml]
 ```bash
 mpirun -n 4 ./gys_io gys_io.yaml
 ```
+
 Do not forget to activate the python venv if you are using PyCall:
 
 ```bash
-source venv/bin/activate
+source .gys_env/bin/activate
 ```
+
+`.gys_env/` is created by `./installer.sh` at the repository root.
 
 ## Configuration
 
