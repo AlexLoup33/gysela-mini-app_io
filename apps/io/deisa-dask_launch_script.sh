@@ -6,7 +6,7 @@ DASK_WORKERS=${2:-1}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(cd $SCRIPT_DIR/../.. && pwd)"
 
-. $SCRIPT_DIR/env-miniapp-gysela.sh
+. $SCRIPT_DIR/env-miniapp-io.sh
 
 SCHEFILE="$BASE_DIR/scheduler.json"
 rm -f $SCHEFILE

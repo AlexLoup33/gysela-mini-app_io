@@ -7,7 +7,7 @@ DASK_THREADS_PER_WORKER=${3:-2}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(cd $SCRIPT_DIR/../.. && pwd)"
 
-. $SCRIPT_DIR/env-miniapp-gysela.sh
+. $SCRIPT_DIR/env-miniapp-io.sh
 
 export DASK_DISTRIBUTED__WORKER__MEMORY__SPILL=False
 export DASK_DISTRIBUTED__WORKER__MEMORY__TARGET=False
@@ -37,7 +37,7 @@ export DEISA_DASK_SCHEDULER_ADDRESS=$(jq -r '.["address"]' $SCHEFILE)
 echo "Launch workers"
 dask_worker_pids=()
 for NODE in "${WORKER_NODES[@]}"; do
-    oarsh ${NODE} ". $BASE_DIR/apps/io/env-miniapp-gysela.sh && dask worker \
+    oarsh ${NODE} ". $BASE_DIR/apps/io/env-miniapp-io.sh && dask worker \
         --nworkers 1 \
         --nthreads ${DASK_THREADS_PER_WORKER} \
         --local-directory /tmp \

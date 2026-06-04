@@ -41,7 +41,7 @@ To use deisa-dask, you need to create the environment of the miniapp with additi
 cp apps/io/spack_deisa-dask.yaml external/gyselalibxx/toolchains/<MACHINE>/gyselalibxx-env-1.1.0.yaml
 ./external/gyselalibxx/toolchains/cpu.spack.gyselalibxx_env/prepare.sh
 ```
-Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps/io/env-miniapp-gysela.sh`
+Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps/io/env-miniapp-io.sh`
 
 ### Basic run
 
