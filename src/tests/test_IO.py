@@ -4,7 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 GYS_IO = REPO_ROOT / "build" / "apps" / "io" / "gys_io"
 IO_DIR = REPO_ROOT / "apps" / "io"
 REPO_PYTHON = REPO_ROOT / "src" / "python"
