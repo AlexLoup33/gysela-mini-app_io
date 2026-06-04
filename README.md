@@ -56,6 +56,12 @@ You can disable either app at configuration time using CMake options:
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=src/external/gyselalibxx/toolchains/<MACHINE>/toolchain.cmake 
 cmake --build build -j 4
 ```
+For the docker toolchain, you should use the following in the docker container:
+```bash
+cmake -S . -B build
+cmake --build build -j 4
+```
+
 If you want to use Python insitu-diagnostics set additionally the `PYTHONPATH`:
 
 ```bash
