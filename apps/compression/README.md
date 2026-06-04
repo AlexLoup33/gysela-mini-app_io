@@ -34,6 +34,14 @@ The baseline branch is run once from the analytic initial condition for the full
 
 The compressed branch is run segment by segment. At the end of each segment, except the final one, the current restart file is compressed with your favourite method and immediately reconstructed into an approximate HDF5 restart. The next segment restarts from that approximation.
 
+## Python environment
+
+Activate the project virtual environment (created by `./installer.sh` at the repo root):
+
+```bash
+source .gys_env/bin/activate
+```
+
 ## Running the benchmark
 
 Simply run:

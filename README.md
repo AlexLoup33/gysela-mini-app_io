@@ -12,7 +12,7 @@ cd gysela-mini-app_io
 git submodule update --init --recursive
 ```
 
-## Quick install (toolchain + Python + build + tests)
+## Quick install
 
 After cloning and initializing submodules:
 
@@ -21,6 +21,7 @@ sh ./installer.sh <MACHINE>
 ```
 
 Example on Persee (CPU): `./installer.sh persee/xeon`
+
 
 `<MACHINE>` is a folder under `src/external/gyselalibxx/toolchains/`. 
 Available values:
@@ -35,10 +36,13 @@ Available values:
 - `persee/xeon` — Persee (CPU); default on Persee hosts if `<MACHINE>` is omitted
 - `v100.ruche` — Ruche (V100)
 
-## Manuel Installation
+## Manual installation
 
 ```bash
 source src/external/gyselalibxx/toolchains/<MACHINE>/environment.sh
+python -m venv .gys_env    # skip if .gys_env already exists
+source .gys_env/bin/activate
+pip install -e ".[dev]"
 ```
 
 For more details see [Gyselalib++ environment toolchains](https://gyselax.github.io/gyselalibxx/toolchains/index.html#environment-setup).
@@ -65,6 +69,7 @@ cmake --build build -j 4
 If you want to use Python insitu-diagnostics set additionally the `PYTHONPATH`:
 
 ```bash
+source .gys_env/bin/activate
 export PYTHONPATH=/path/to/your/repo/gysela-mini-app_io/src/python:$PYTHONPATH
 ```
 

@@ -25,11 +25,14 @@ mpirun -n <nprocs> ./gys_io [config.yaml] [pdi_config.yml]
 ```bash
 mpirun -n 4 ./gys_io gys_io.yaml
 ```
-Do not forget to set the the `PYTHONPATH` if you are using PyCall:
+For in-situ Python (PDI `pycall`), use the project environment and `PYTHONPATH`:
 
 ```bash
-export PYTHONPATH=/path/to/your/gysela-mini-app_io/src/python:$PYTHONPATH
+source /path/to/gysela-mini-app_io/.gys_env/bin/activate
+export PYTHONPATH=/path/to/gysela-mini-app_io/src/python:$PYTHONPATH
 ```
+
+`.gys_env/` is created by `./installer.sh` at the repository root.
 
 ## Configuration
 
