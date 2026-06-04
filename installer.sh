@@ -8,7 +8,7 @@
 #   ./installer.sh persee/xeon
 #   ./installer.sh h100.jean-zay.spack
 
-set -euo pipefail
+set -eo pipefail
 
 MACHINE="${1:-${GYSELA_MACHINE:-}}"
 if [[ -z "${MACHINE}" ]]; then
@@ -48,7 +48,9 @@ source "${ENV_SH}"
 export PYTHONPATH="${REPO_ROOT}/src/python${PYTHONPATH:+:${PYTHONPATH}}"
 
 echo "==> pip install -e .[dev]"
-pip install -e ".[dev]"
+python -m venv venv
+source ./venv/bin/activate
+python -m pip install -e ".[dev]"
 
 BUILD_DIR="${REPO_ROOT}/build"
 JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"
