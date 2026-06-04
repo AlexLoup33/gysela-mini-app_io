@@ -20,12 +20,12 @@ COMPRESSOR_PARAMS = {
     "clip_nonnegative": False,
 }
 
-EXEC_CMD = ["mpirun", "-n", "4", "./build/apps/compression/compression_app"]
+EXEC_CMD = ["mpirun", "-n", "4", "./build/apps/compression/gys_compress"]
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
-SOURCE_GYSELA_YAML = os.path.join(SCRIPT_DIR, "params.yaml")
+SOURCE_GYSELA_YAML = os.path.join(SCRIPT_DIR, "params_landau_damping.yaml")
 SOURCE_PDI_YAML = os.path.join(SCRIPT_DIR, "pdi_out.yaml")
 
 
@@ -136,7 +136,8 @@ def read_benchmark_config(config):
         compression_period = int(config["CompressionBenchmark"]["compression_period"])
     except KeyError as exc:
         raise RuntimeError(
-            "Missing required benchmark parameter in params.yaml. "
+            "Missing required benchmark parameter in the GYSELA input template "
+            f"({os.path.basename(SOURCE_GYSELA_YAML)}). "
             "Expected Algorithm.nbiter and CompressionBenchmark.compression_period."
         ) from exc
 

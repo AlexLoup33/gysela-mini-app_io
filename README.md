@@ -36,11 +36,7 @@ Available values:
 - `persee/xeon` — Persee (CPU); default on Persee hosts if `<MACHINE>` is omitted
 - `v100.ruche` — Ruche (V100)
 
-<<<<<<< HEAD
 ## Manual installation
-=======
-## Manual Installation
->>>>>>> 583cb6b79e5d6400e9d85ffa4f1a90cb55233834
 
 ```bash
 source src/external/gyselalibxx/toolchains/<MACHINE>/environment.sh
@@ -75,23 +71,19 @@ cmake --build build -j 4
 
 In order to use the python tools, you'll need to execute the following commands from the repo's root:
 ```bash
-<<<<<<< HEAD
 source .gys_env/bin/activate
 export PYTHONPATH=/path/to/your/repo/gysela-mini-app_io/src/python:$PYTHONPATH
-=======
-python -m venv venv
-source venv/bin/activate
-python -m pip install -e ./
 ```
 
 If you want to use Python insitu-diagnostics, the following commands are available from the command line:
 ```bash
 read-timing-stats
 verify-fluid-moments
->>>>>>> 583cb6b79e5d6400e9d85ffa4f1a90cb55233834
 ```
 
 ## Running
 
 Each app has its own usage instructions. See the README file in the corresponding app folder for details.
+
+The compression mini-app (`apps/compression/`) takes a GYSELA YAML config and `pdi_out.yaml` on the command line. Case-specific templates are `params_landau_damping.yaml` and `params_two_stream.yaml`; the compression benchmark launcher uses `params_landau_damping.yaml` by default.
 
