@@ -14,16 +14,16 @@ This mini application:
 ## Usage
 
 ```bash
-mpirun -n <nprocs> ./gys_io [config.yaml] [pdi_config.yml]
+mpirun -n <nprocs> ./build/apps/io/gys_io [config.yaml] [pdi_config.yml]
 ```
 
 - `config.yaml`: Input configuration file (default: uses built-in defaults)
-- `pdi_config.yml`: PDI configuration file (default: uses `pdi_default.yml.hpp`)
+- `pdi_config.yml`: PDI configuration file (default: uses `seq_pdi.yml`)
 
 ### Example
 
 ```bash
-mpirun -n 4 ./gys_io gys_io.yaml
+mpirun -n 4 ./build/apps/io/gys_io apps/io/gys_io.yaml
 ```
 Do not forget to set the the `PYTHONPATH` if you are using PyCall:
 
@@ -46,7 +46,7 @@ Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps
 ### Basic run
 
 ```bash
-./deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
+./apps/io/deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc> [pdi_config.yml] [analytics_script.yml]
 ```
 
 - `nsimu_procs`: number of MPI ranks for the simulation
@@ -55,7 +55,7 @@ Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps
 ### Run with OAR
 
 ```bash
-./oar_deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
+./apps/io/oar_deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
 ```
 
 ## Configuration
