@@ -9,7 +9,7 @@ ANALYTICS_FILE=${4:-analytics.py}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(cd $SCRIPT_DIR/../.. && pwd)"
 
-. $SCRIPT_DIR/env-miniapp-io.sh
+. ${BASE_DIR}/apps/io/activate_deisa_spack_env.sh
 
 SCHEFILE="$BASE_DIR/scheduler.json"
 rm -f $SCHEFILE
