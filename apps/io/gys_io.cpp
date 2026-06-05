@@ -570,7 +570,6 @@ int main(int argc, char **argv) {
     //-----------------------------------------------------------------------
     // Compute fluid moments in Python (density, mean velocity, temperature)
     //-----------------------------------------------------------------------
-    DFieldMemSpGrid allfdistribu_work(local_mesh);
     // Copy the initial distribution to the host (needed for PDI)
     ddc::parallel_deepcopy(allfdistribu_host,
                            allfdistribu); // alldistribu_host <--- allfdistribu
@@ -579,28 +578,22 @@ int main(int argc, char **argv) {
         cout << "Iteration " << i << endl;
       }
       PDI_expose("iter_id", &i, PDI_OUT);
-
       // Compute fluid moments in Python (density, mean velocity, temperature)
       // in PDI
       compute_fluid_moments_pycall(rank, local_mesh, global_mesh,
                                    allfdistribu_host);
-      // Create a working copy from the current distribution
-      ddc::parallel_deepcopy(
-          allfdistribu_work,
-          allfdistribu_host); // alldistribu_work <--- allfdistribu_host
-      // Update the working copy (not the original)
+      // Update the distribution function
       if (rank == 0) {
         cout << "Updating distribution function" << endl;
       }
-      update_distribution_fun(get_field(allfdistribu_work), local_mesh,
-                              configs.conf_gyselax, MPI_COMM_WORLD);
-      // Copy the working copy to the host (needed for PDI)
-      //ddc::parallel_deepcopy(
-      //    allfdistribu_host,
-      //    allfdistribu_work); // alldistribu_host <--- allfdistribu_work
+      if (i < n_iterations - 1) {
+        update_distribution_fun(get_field(allfdistribu), local_mesh,
+                                configs.conf_gyselax, MPI_COMM_WORLD);
+        // Copy the updated distribution to the host
+        ddc::parallel_deepcopy(allfdistribu_host,
+                           allfdistribu); // alldistribu_host <--- allfdistribu
+      }
     }
-    ddc::parallel_deepcopy(allfdistribu,
-                           allfdistribu_host); // alldistribu_host <--- allfdistribu
     // ------------------------------------------------------------------------------
   }
   time_points[2] = steady_clock::now();
