@@ -8,6 +8,7 @@ import time
 import logging
 import xarray as xr
 import dask.array as da
+from pathlib import Path
 from deisa.dask import Deisa
 from distributed import Variable, Queue, get_client
 
@@ -45,6 +46,9 @@ def sum_moments(partial_density, partial_velocity, partial_temperature):
         density = density.sum(dim=('vpar', 'mu'))
         velocity = velocity.sum(dim=('vpar', 'mu'))
         temperature = temperature.sum(dim=('vpar', 'mu'))
+
+    output_dir = Path("output")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     with h5py.File(f'output/optimised_fluid_moments_{timestep}.h5', 'w') as fh5:
         fh5.create_dataset('density', data=density)

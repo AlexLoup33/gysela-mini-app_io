@@ -8,6 +8,7 @@ import time
 import logging
 import xarray as xr
 import dask.array as da
+from pathlib import Path
 from fluid_moments import FluidMoments
 from deisa.dask import Deisa
 from distributed import Variable, Queue, get_client
@@ -43,6 +44,9 @@ def compute_moments(fdistribu_raw):
     density = fm.compute_density(fdistribu)
     velocity = fm.compute_velocity(fdistribu, density)
     temperature = fm.compute_temperature(fdistribu, density, velocity)
+
+    output_dir = Path("output")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     with h5py.File(f'output/normal_fluid_moments_{timestep}.h5', 'w') as fh5:
         fh5.create_dataset('density', data=density)
