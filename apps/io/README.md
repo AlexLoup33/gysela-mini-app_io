@@ -11,37 +11,19 @@ This mini application:
 - Computes fluid moments (density, mean velocity, temperature) via C++ integration or in-situ Python computation
 - Measures and saves CPU timing statistics
 
-## Usage
-
-```bash
-mpirun -n <nprocs> ./build/apps/io/gys_io [config.yaml] [pdi_config.yml]
-```
-
-- `config.yaml`: Input configuration file (default: uses built-in defaults)
-- `pdi_config.yml`: PDI configuration file (default: uses `seq_pdi.yml`)
-
-### Example
-
-```bash
-mpirun -n 4 ./build/apps/io/gys_io apps/io/gys_io.yaml
-```
-Do not forget to set the the `PYTHONPATH` if you are using PyCall:
-
-```bash
-export PYTHONPATH=/path/to/your/gysela-mini-app_io/src/python:$PYTHONPATH
-```
-
-## Usage with Deisa-dask
-
 ### Installation
 
-To use deisa-dask, you need to create the environment of the miniapp with additional dependencies.
-
+For CPU use cases :
 ```bash
-cp apps/io/spack_deisa-dask.yaml external/gyselalibxx/toolchains/<MACHINE>/gyselalibxx-env-1.1.0.yaml
-./external/gyselalibxx/toolchains/cpu.spack.gyselalibxx_env/prepare.sh
+./toolchains/cpu.spack.mini_app_io_env/prepare.sh
 ```
-Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps/io/env-miniapp-io.sh`
+Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps/io/activate_deisa_spack_env.sh` line 4.
+
+### Persee XEON
+
+If you run on persee, the environment is already available. You have nothing to change.
+
+## Usage
 
 ### Basic run
 
@@ -51,6 +33,16 @@ Then insert the correct <MACHINE> toolchain path in the `gysela-mini-app_io/apps
 
 - `nsimu_procs`: number of MPI ranks for the simulation
 - `nworkers`: number of Dask workers to use for the analytics
+- `config.yaml`: Input configuration file (default: uses built-in defaults)
+- `pdi_config.yml`: PDI configuration file (default: uses `pdi_deisa.yaml`)
+
+
+### Sequential Run
+
+```bash
+source toolcahins/<machine>/[prepare.sh | environment.sh]
+mpirun -n <nprocs> ./build/apps/io/gys_io [config.yaml] seq_pdi.yaml
+```
 
 ### Run with OAR
 
