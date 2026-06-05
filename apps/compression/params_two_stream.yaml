@@ -32,7 +32,7 @@ Algorithm:
   nbiter: 400
 
 CompressionBenchmark:
-  compression_period: 1000
+  compression_period: 10
 
 Output:
   time_diag: 0.5
