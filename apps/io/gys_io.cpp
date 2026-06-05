@@ -522,11 +522,6 @@ int main(int argc, char **argv) {
       PDI_expose_idx_range(global_mesh, "density");
       PDI_expose_idx_range(global_mesh, "mean_velocity");
       PDI_expose_idx_range(global_mesh, "temperature");
-      PDI_expose_idx_range(local_mesh, "tor1");
-      PDI_expose_idx_range(local_mesh, "tor2");
-      PDI_expose_idx_range(local_mesh, "tor3");
-      PDI_expose_idx_range(local_mesh, "vpar");
-      PDI_expose_idx_range(local_mesh, "mu");
 
       ddc::PdiEvent("InitBridge");
     /*
