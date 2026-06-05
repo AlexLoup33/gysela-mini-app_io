@@ -18,11 +18,9 @@ deisa = Deisa()
 
 @deisa.register("fdistribu_raw")
 def compute_moments(fdistribu_raw):
+    # ===== will no longer be needed once xarrays can be sent through the bridge ======
     client = get_client()
     coords = client.gather(client.get_dataset("coords"))
-
-    timestep = fdistribu_raw[0].t
-    assert coords['iter'] == timestep
 
     fdistribu = xr.DataArray(
             fdistribu_raw[0],
@@ -36,6 +34,9 @@ def compute_moments(fdistribu_raw):
                 'mu':   coords['mu'],
             },
     )
+    # =================================================================================
+
+    timestep = fdistribu_raw[0].t
 
     fm = FluidMoments(coords["vpar"], coords["mu"])
 

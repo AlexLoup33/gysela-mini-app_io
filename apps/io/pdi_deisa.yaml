@@ -199,6 +199,7 @@ plugins:
               vpar_vals: $vpar, 
               mu_vals: $mu}
         exec: |
+          # ===== will no longer be needed once xarrays can be sent through the bridge ======
           if comm.Get_rank() == 0:
             client = bridge.client
             client.publish_dataset(coords={
@@ -211,6 +212,7 @@ plugins:
             }, override=True)
 
           comm.Barrier()
+          # =================================================================================
 
           bridge.send("fdistribu_raw", local_fdistribu_raw, int(iter_id))
       End:

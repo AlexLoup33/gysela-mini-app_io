@@ -19,6 +19,7 @@ deisa = Deisa()
         "partial_velocity", 
         "partial_temperature")
 def sum_moments(partial_density, partial_velocity, partial_temperature):
+    # ===== will no longer be needed once xarrays can be sent through the bridge ======
     if len(partial_density[0].shape) == 6:
         dims = ('species', 'tor1', 'tor2', 'tor3', 'vpar', 'mu')
     elif len(partial_density[0].shape) == 4:
@@ -38,6 +39,8 @@ def sum_moments(partial_density, partial_velocity, partial_temperature):
             partial_temperature[0],
             dims=dims
             )
+    # =================================================================================
+
     if 'vpar' in density.dims and 'mu' in density.dims:
         density = density.sum(dim=('vpar', 'mu'))
         velocity = velocity.sum(dim=('vpar', 'mu'))
