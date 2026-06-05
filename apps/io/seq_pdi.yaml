@@ -157,66 +157,29 @@ plugins:
       Init:
         with: {}
         exec: |
-          import json
-          import time
-          import logging
-          from mpi4py import MPI
-          from deisa.dask import Bridge
-
-          #logging.basicConfig(level=logging.DEBUG)
-
-          comm = MPI.COMM_WORLD
-      InitBridge:
-        with: { fdistribu_extents: $fdistribu_extents, 
-                local_fdistribu_extents: $local_fdistribu_extents,
-                local_fdistribu_starts: $local_fdistribu_starts }
-        exec: |
-          arrays_metadata = { 'fdistribu_raw': {
-                                      'global_shape': ( int(fdistribu_extents[0]),
-                                                        int(fdistribu_extents[1]),
-                                                        int(fdistribu_extents[2]),
-                                                        int(fdistribu_extents[3]),
-                                                        int(fdistribu_extents[4]),
-                                                        int(fdistribu_extents[5])),
-                                      'chunk_shape': (  int(local_fdistribu_extents[0]),
-                                                        int(local_fdistribu_extents[1]),
-                                                        int(local_fdistribu_extents[2]),
-                                                        int(local_fdistribu_extents[3]),
-                                                        int(local_fdistribu_extents[4]),
-                                                        int(local_fdistribu_extents[5])),
-                                      'chunk_position': tuple((local_fdistribu_starts // local_fdistribu_extents).astype(int).tolist()),
-
-                              },
-          }
-
-          bridge = Bridge(comm, arrays_metadata)
+          import xarray as xr
+          import numpy as np
+          from fluid_moments import FluidMoments
       FluidMoments:
-        with: {iter_id: $iter_id, 
-              local_fdistribu_raw: $local_fdistribu_sptor3Dv2D, 
-              tor1_vals: $tor1, 
-              tor2_vals: $tor2, 
-              tor3_vals: $tor3, 
-              vpar_vals: $vpar, 
-              mu_vals: $mu}
+        with: {local_fdistribu_raw: $local_fdistribu_sptor3Dv2D, vpar_vals: $vpar, mu_vals: $mu}
         exec: |
-          if comm.Get_rank() == 0:
-            client = bridge.client
-            client.publish_dataset(coords={
-              'tor1': tor1_vals,
-              'tor2': tor2_vals,
-              'tor3': tor3_vals,
-              'vpar': vpar_vals,
-              'mu':   mu_vals,
-              'iter': int(iter_id),
-            }, override=True)
+          fdistribu = xr.DataArray(
+              local_fdistribu_raw,
+              dims=( 'species', 'tor1', 'tor2', 'tor3', 'vpar', 'mu'),
+          )
 
-          comm.Barrier()
+          fm = FluidMoments(vpar_vals, mu_vals)
 
-          bridge.send("fdistribu_raw", local_fdistribu_raw, int(iter_id))
-      End:
-        with: {iter_id: $iter_id}
-        exec: |
-          bridge.close(int(iter_id))
+          density = fm.compute_density(fdistribu)
+          velocity = fm.compute_velocity(fdistribu, density)
+          temperature = fm.compute_temperature(fdistribu, density, velocity)
+
+          ds_out = xr.Dataset({
+              'density': density,
+              'velocity': velocity,
+              'temperature': temperature,
+          })
+          ds_out.to_netcdf('fluid_moments.nc', mode='w')
   decl_hdf5:
     #-- Read file names and expose them to PDI
     - file: '${gysela_io_filename}'
@@ -318,7 +281,7 @@ plugins:
         tor3: ~
         vpar: ~
         mu: ~
-        local_fdistribu_sptor3Dv2D: 
+        local_fdistribu_sptor3Dv2D:
           dataset: fdistribu_sptor3Dv2D
           dataset_selection:
             size: [ '$local_fdistribu_extents[0]', '$local_fdistribu_extents[1]', '$local_fdistribu_extents[2]', '$local_fdistribu_extents[3]', '$local_fdistribu_extents[4]', '$local_fdistribu_extents[5]' ]

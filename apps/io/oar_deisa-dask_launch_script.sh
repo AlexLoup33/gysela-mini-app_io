@@ -47,7 +47,7 @@ done
 sleep 10
 
 echo "Launch analytics"
-python3 python/analytics.py apps/io/gys_io.yaml &
+python3 src/python/analytics.py &
 analytics_pid=$!
 
 echo "Launch simulation"

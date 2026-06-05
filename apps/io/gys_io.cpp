@@ -305,7 +305,7 @@ void write_cpu_time_stats(int rank, double const *durations,
   std::vector<char> timing_names_2d(num_entries * max_str_len, '\0');
   for (std::size_t i = 0; i < num_names; ++i) {
     std::copy(names[i].begin(), names[i].end(),
-              timing_names_2d.begin() + i * max_str_len);
+            timing_names_2d.begin() + i * max_str_len);
   }
 
   // Expose timing data (sizes as scalars, arrays via PDI_expose)
@@ -522,6 +522,11 @@ int main(int argc, char **argv) {
       PDI_expose_idx_range(global_mesh, "density");
       PDI_expose_idx_range(global_mesh, "mean_velocity");
       PDI_expose_idx_range(global_mesh, "temperature");
+      PDI_expose_idx_range(local_mesh, "tor1");
+      PDI_expose_idx_range(local_mesh, "tor2");
+      PDI_expose_idx_range(local_mesh, "tor3");
+      PDI_expose_idx_range(local_mesh, "vpar");
+      PDI_expose_idx_range(local_mesh, "mu");
 
       ddc::PdiEvent("InitBridge");
     /*
@@ -590,9 +595,9 @@ int main(int argc, char **argv) {
       update_distribution_fun(get_field(allfdistribu_work), local_mesh,
                               configs.conf_gyselax, MPI_COMM_WORLD);
       // Copy the working copy to the host (needed for PDI)
-      ddc::parallel_deepcopy(
-          allfdistribu_host,
-          allfdistribu_work); // alldistribu_host <--- allfdistribu_work
+      //ddc::parallel_deepcopy(
+      //    allfdistribu_host,
+      //    allfdistribu_work); // alldistribu_host <--- allfdistribu_work
     }
     ddc::parallel_deepcopy(allfdistribu,
                            allfdistribu_host); // alldistribu_host <--- allfdistribu

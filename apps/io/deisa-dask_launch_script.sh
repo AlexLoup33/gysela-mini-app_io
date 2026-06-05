@@ -3,6 +3,9 @@
 SIMU_NODES=${1:-1}
 DASK_WORKERS=${2:-1}
 
+PDI_CONFIG=${3:-pdi_deisa.yaml}
+ANALYTICS_FILE=${4:-analytics.py}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(cd $SCRIPT_DIR/../.. && pwd)"
 
@@ -34,11 +37,11 @@ dask_worker_pid=$!
 sleep 10
 
 echo "Launch analytics"
-python3 python/analytics.py apps/io/gys_io.yaml &
+python3 src/python/$ANALYTICS_FILE &
 analytics_pid=$!
 
 echo "Launch simu"
-mpirun -n $SIMU_NODES build/apps/io/gys_io apps/io/gys_io.yaml apps/io/pdi_deisa.yaml & 
+mpirun -n $SIMU_NODES $BASE_DIR/build/apps/io/gys_io $SCRIPT_DIR/gys_io.yaml $SCRIPT_DIR/$PDI_CONFIG & 
 simu_pid=$!
 
 wait ${analytics_pid}

@@ -6,39 +6,47 @@ import json
 import yaml
 import time
 import logging
+import xarray as xr
 import dask.array as da
+from fluid_moments import FluidMoments
 from deisa.dask import Deisa
 from distributed import Variable, Queue, get_client
 
 #logging.basicConfig(level=logging.DEBUG)
 
-gys_io_config = sys.argv[1]
-with open(gys_io_config, 'r') as config_file:
-    nb_iter = yaml.safe_load(config_file)["Application"]["n_iterations"]
-
-print(f"[Deisa] Start connection of Deisa\n")
 deisa = Deisa()
-print("[Deisa] Connected\n")
 
-@deisa.register("density", "velocity", "temperature")
-def sum_moments(density, velocity, temperature):
-    sum_density = density[0].sum().compute() 
-    sum_velocity = velocity[0].sum().compute() 
-    sum_temperature = temperature[0].sum().compute() 
+@deisa.register("fdistribu_raw")
+def compute_moments(fdistribu_raw):
+    client = get_client()
+    coords = client.gather(client.get_dataset("coords"))
 
-    print(f"[Deisa] With arrays of resp. iterations \
-            {density[0].t}, \
-            {velocity[0].t}, \
-            {temperature[0].t}", flush=True)
-    print(f"[Deisa] sum density {sum_density}", flush=True)
-    print(f"[Deisa] sum velocity {sum_velocity}", flush=True)
-    print(f"[Deisa] sum temperature {sum_temperature}", flush=True)
+    timestep = fdistribu_raw[0].t
+    assert coords['iter'] == timestep
 
-    if density[0].t == nb_iter-1:
-        with h5py.File("deisa_fluid_moments.h5", 'w') as f:
-            f.create_dataset("density", data=density[0])
-            f.create_dataset("mean_velocity", data=velocity[0])
-            f.create_dataset("temperature", data=temperature[0])
+    fdistribu = xr.DataArray(
+            fdistribu_raw[0],
+            dims=('species', 'tor1', 'tor2', 'tor3', 'vpar', 'mu'),
+            coords={
+                'species': [0, 1],
+                'tor1': coords['tor1'],
+                'tor2': coords['tor2'],
+                'tor3': coords['tor3'],
+                'vpar': coords['vpar'],
+                'mu':   coords['mu'],
+            },
+    )
+
+    fm = FluidMoments(coords["vpar"], coords["mu"])
+
+    density = fm.compute_density(fdistribu)
+    velocity = fm.compute_velocity(fdistribu, density)
+    temperature = fm.compute_temperature(fdistribu, density, velocity)
+
+    with h5py.File(f'output/normal_fluid_moments_{timestep}.h5', 'w') as fh5:
+        fh5.create_dataset('density', data=density)
+        fh5.create_dataset('velocity', data=velocity)
+        fh5.create_dataset('temperature', data=temperature)
 
 deisa.execute_callbacks()
 

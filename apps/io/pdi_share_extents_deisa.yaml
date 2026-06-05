@@ -65,6 +65,11 @@ metadata:
   tor3_extents: { type: array, subtype: size_t, size: 1 }
   vpar_extents: { type: array, subtype: size_t, size: 1 }
   mu_extents: { type: array, subtype: size_t, size: 1 }
+  tor1_starts: { type: array, subtype: size_t, size: 1 }
+  tor2_starts: { type: array, subtype: size_t, size: 1 }
+  tor3_starts: { type: array, subtype: size_t, size: 1 }
+  vpar_starts: { type: array, subtype: size_t, size: 1 }
+  mu_starts: { type: array, subtype: size_t, size: 1 }
   breakpoints_tor1:
     type: array
     subtype: double
@@ -169,8 +174,20 @@ plugins:
       InitBridge:
         with: { fdistribu_extents: $fdistribu_extents, 
                 local_fdistribu_extents: $local_fdistribu_extents,
-                local_fdistribu_starts: $local_fdistribu_starts }
+                local_fdistribu_starts: $local_fdistribu_starts,
+                tor1_extents: $tor1_extents,
+                tor2_extents: $tor2_extents,
+                tor3_extents: $tor3_extents,
+                vpar_extents: $vpar_extents,
+                mu_extents: $mu_extents,
+                tor1_starts: $tor1_starts,
+                tor2_starts: $tor2_starts,
+                tor3_starts: $tor3_starts,
+                vpar_starts: $vpar_starts,
+                mu_starts: $mu_starts }
         exec: |
+          print(f"{fdistribu_extents=}", flush=True)
+          print(f"{tor1_extents=}", flush=True)
           arrays_metadata = { 'fdistribu_raw': {
                                       'global_shape': ( int(fdistribu_extents[0]),
                                                         int(fdistribu_extents[1]),
@@ -187,6 +204,35 @@ plugins:
                                       'chunk_position': tuple((local_fdistribu_starts // local_fdistribu_extents).astype(int).tolist()),
 
                               },
+                              'tor1_raw': {
+                                      'global_shape': ( int(tor1_extents[0])),
+                                      'chunk_shape': (  int(tor1_extents[0])),
+                                      'chunk_position': tuple((tor1_starts // tor1_extents).astype(int).tolist()),
+
+                              },
+                              'tor2_raw': {
+                                      'global_shape': ( int(tor2_extents[0])),
+                                      'chunk_shape': (  int(tor2_extents[0])),
+                                      'chunk_position': tuple((tor2_starts // tor2_extents).astype(int).tolist()),
+
+                              },
+                              'tor3_raw': {
+                                      'global_shape': ( int(tor3_extents[0])),
+                                      'chunk_shape': (  int(tor3_extents[0])),
+                                      'chunk_position': tuple((tor3_starts // tor3_extents).astype(int).tolist()),
+
+                              },
+                              'vpar_raw': {
+                                      'global_shape': ( int(vpar_extents[0])),
+                                      'chunk_shape': (  int(vpar_extents[0])),
+                                      'chunk_position': tuple((vpar_starts // vpar_extents).astype(int).tolist()),
+
+                              },
+                              'mu_raw': {
+                                      'global_shape': ( int(mu_extents[0])),
+                                      'chunk_shape': (  int(mu_extents[0])),
+                                      'chunk_position': tuple((mu_starts // mu_extents).astype(int).tolist()),
+                              },
           }
 
           bridge = Bridge(comm, arrays_metadata)
@@ -199,20 +245,12 @@ plugins:
               vpar_vals: $vpar, 
               mu_vals: $mu}
         exec: |
-          if comm.Get_rank() == 0:
-            client = bridge.client
-            client.publish_dataset(coords={
-              'tor1': tor1_vals,
-              'tor2': tor2_vals,
-              'tor3': tor3_vals,
-              'vpar': vpar_vals,
-              'mu':   mu_vals,
-              'iter': int(iter_id),
-            }, override=True)
-
-          comm.Barrier()
-
           bridge.send("fdistribu_raw", local_fdistribu_raw, int(iter_id))
+          bridge.send("tor1_raw", tor1_vals, int(iter_id))
+          bridge.send("tor2_raw", tor2_vals, int(iter_id))
+          bridge.send("tor3_raw", tor3_vals, int(iter_id))
+          bridge.send("vpar_raw", vpar_vals, int(iter_id))
+          bridge.send("mu_raw", mu_vals, int(iter_id))
       End:
         with: {iter_id: $iter_id}
         exec: |
@@ -308,7 +346,7 @@ plugins:
       collision_policy: replace_and_warn
       communicator: $MPI_COMM_WORLD
       datasets:
-        fdistribu_sptor3Dv2D:
+        local_fdistribu_sptor3Dv2D:
           type: array
           subtype: double
           size: [ '$species_extents[0]', '$tor1_extents[0]', '$tor2_extents[0]', '$tor3_extents[0]', '$vpar_extents[0]', '$mu_extents[0]' ]
@@ -318,11 +356,10 @@ plugins:
         tor3: ~
         vpar: ~
         mu: ~
-        local_fdistribu_sptor3Dv2D: 
-          dataset: fdistribu_sptor3Dv2D
-          dataset_selection:
-            size: [ '$local_fdistribu_extents[0]', '$local_fdistribu_extents[1]', '$local_fdistribu_extents[2]', '$local_fdistribu_extents[3]', '$local_fdistribu_extents[4]', '$local_fdistribu_extents[5]' ]
-            start: [ '$local_fdistribu_starts[0]', '$local_fdistribu_starts[1]', '$local_fdistribu_starts[2]', '$local_fdistribu_starts[3]', '$local_fdistribu_starts[4]', '$local_fdistribu_starts[5]' ]
+        local_fdistribu_sptor3Dv2D:
+            dataset_selection:
+              size: [ '$local_fdistribu_extents[0]', '$local_fdistribu_extents[1]', '$local_fdistribu_extents[2]', '$local_fdistribu_extents[3]', '$local_fdistribu_extents[4]', '$local_fdistribu_extents[5]' ]
+              start: [ '$local_fdistribu_starts[0]', '$local_fdistribu_starts[1]', '$local_fdistribu_starts[2]', '$local_fdistribu_starts[3]', '$local_fdistribu_starts[4]', '$local_fdistribu_starts[5]' ]
 
     #-- Write fluid moments
     - file: 'fluid_moments.h5'
