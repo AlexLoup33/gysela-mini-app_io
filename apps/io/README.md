@@ -50,6 +50,8 @@ mpirun -n <nprocs> ./build/apps/io/gys_io [config.yaml] seq_pdi.yaml
 ./apps/io/oar_deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc>
 ```
 
+`.gys_env/` is created by `./installer.sh` at the repository root.
+
 ## Configuration
 
 Edit `gys_io.yaml` to configure:
