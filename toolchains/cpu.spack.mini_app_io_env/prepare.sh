@@ -58,7 +58,7 @@ else
   COMPILER='gcc@11:'
 fi
 
-spack env create mini-app-env ${SCRIPT_DIR}/mini-app-env.yaml
+spack env create mini-app-env ${SCRIPT_DIR}/mini-app-io-env.yaml
 spack --env mini-app-env config --scope env:mini-app-env add packages:all:target:[$(spack arch --family --target)]
 spack --env mini-app-env install --jobs 2
 spack env activate -p mini-app-env
