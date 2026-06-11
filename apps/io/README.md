@@ -32,7 +32,7 @@ If you run on persee, the environment is already available. You have nothing to 
 ```
 
 - `nsimu_procs`: number of MPI ranks for the simulation
-- `nworkers`: number of Dask workers to use for the analytics
+- `nworker_proc`: number of Dask workers to use for the analytics
 - `config.yaml`: Input configuration file (default: uses built-in defaults)
 - `pdi_config.yml`: PDI configuration file (default: uses `pdi_deisa.yaml`)
 
