@@ -28,13 +28,13 @@ If you run on persee, the environment is already available. You have nothing to 
 ### Basic run
 
 ```bash
-./apps/io/deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc> [pdi_config.yml] [analytics_script.yml]
+./apps/io/deisa-dask_launch_script.sh <nsimu_procs> <nworker_proc> [pdi_config.yml] [analytics_script.py]
 ```
 
 - `nsimu_procs`: number of MPI ranks for the simulation
 - `nworker_proc`: number of Dask workers to use for the analytics
-- `config.yaml`: Input configuration file (default: uses built-in defaults)
 - `pdi_config.yml`: PDI configuration file (default: uses `pdi_deisa.yaml`)
+- `analytics_script.py`: the analytics script to launch (either `analytics.py` if you chose `pdi_deisa.yaml`, or `optimised_analytics.py` if you chose `optimised_pdi_deisa.yaml`)
 
 
 ### Sequential Run
