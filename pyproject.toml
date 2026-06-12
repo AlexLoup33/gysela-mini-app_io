@@ -20,7 +20,7 @@ dependencies = [
     "netcdf4",
     "tqdm",
     "iops-benchmark",
-    "iops-benchmark["bayesian"],
+    "iops-benchmark[bayesian]",
     "rich"
 ]
 
