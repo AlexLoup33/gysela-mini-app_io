@@ -467,17 +467,17 @@ int main(int argc, char **argv) {
   // Read the configuration
   //---------------------------------------------------------
   ConfigHandles configs = parse_config_files(argc, argv);
-  const bool SUBFILING = PCpp_bool(configs.conf_gyselax, ".Application.subfiling");
+  const bool subfiling = PCpp_bool(configs.conf_gyselax, ".Application.subfiling");
 
-  if (SUBFILING){
-    int provided;
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-    if (provided != MPI_THREAD_MULTIPLE){
-      printf("provided level = %d, required level = %d\n", provided, MPI_THREAD_MULTIPLE);
-      return EXIT_FAILURE;
-    }
-  } else {
-    MPI_Init(&argc, &argv);
+  int required = MPI_THREAD_SINGLE;
+  if (subfiling){
+    required = MPI_THREAD_MULTIPLE;
+  }
+  int provided;
+  MPI_Init_thread(&argc, &argv, required, &provided);
+  if (provided < required){
+    std::printf("provided level = %d, required level = %d\n", provided, required);
+    return EXIT_FAILURE;
   }
   
   int rank;
