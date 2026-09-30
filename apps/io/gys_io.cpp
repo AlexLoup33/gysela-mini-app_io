@@ -463,17 +463,22 @@ int main(int argc, char **argv) {
    *
    ****************************************/
 
-  
-  #ifdef SUBFILING
-  int provided;
-  MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-  if (provided != MPI_THREAD_MULTIPLE){
-    printf("provided level = %d, required level = %d\n", provided, MPI_THREAD_MULTIPLE);
-    return EXIT_FAILURE;
+  //---------------------------------------------------------
+  // Read the configuration
+  //---------------------------------------------------------
+  ConfigHandles configs = parse_config_files(argc, argv);
+  const bool SUBFILING = PCpp_bool(configs.conf_gyselax, ".Application.subfiling");
+
+  if (SUBFILING){
+    int provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+    if (provided != MPI_THREAD_MULTIPLE){
+      printf("provided level = %d, required level = %d\n", provided, MPI_THREAD_MULTIPLE);
+      return EXIT_FAILURE;
+    }
+  } else {
+    MPI_Init(&argc, &argv);
   }
-  #else
-  MPI_Init(&argc, &argv);
-  #endif
   
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -487,9 +492,8 @@ int main(int argc, char **argv) {
   print_banner(rank);
   cout << "rank: " << rank << endl;
   //---------------------------------------------------------
-  // Read and initialise the configuration
+  // Initialise the configuration
   //---------------------------------------------------------
-  ConfigHandles configs = parse_config_files(argc, argv);
   if (rank == 0) {
     cout << "Initialising 5D particle distribution function." << endl;
   }

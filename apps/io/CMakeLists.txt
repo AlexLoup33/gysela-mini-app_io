@@ -4,12 +4,6 @@ add_executable(gys_io
     gys_io.cpp
 )
 
-option(SUBFILING "Enable HDF5 Subfiling support" OFF)
-
-if(SUBFILING)
-	target_compile_definitions(gys_io PRIVATE SUBFILING)
-endif()
-
 target_link_libraries(gys_io
     PUBLIC
         mini_app_io_lib
@@ -18,13 +12,6 @@ target_link_libraries(gys_io
         PDI::PDI_C
         paraconf::paraconf
         MPI::MPI_CXX
-)
-
-# Set PYTHONPATH to include the python directory for Python module imports
-get_filename_component(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR} ABSOLUTE)
-set(PYTHON_MODULE_PATH "${PROJECT_ROOT_DIR}/src/python")
-set_target_properties(gys_io PROPERTIES
-    ENVIRONMENT "PYTHONPATH=${PYTHON_MODULE_PATH}:$ENV{PYTHONPATH}"
 )
 
 install(TARGETS gys_io)
